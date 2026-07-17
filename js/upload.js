@@ -329,10 +329,15 @@ function updateUploadStars(rating) {
 function autoFillExif(exif) {
   if (!exif) return;
 
+  let filled = false;
+
   // Only auto-fill empty fields (don't overwrite user input)
   const setIfEmpty = (id, value) => {
     const el = document.getElementById(id);
-    if (el && !el.value && value) el.value = value;
+    if (el && !el.value && value) {
+      el.value = value;
+      filled = true;
+    }
   };
 
   setIfEmpty('photoEquipment', exif.equipment || '');
@@ -341,4 +346,8 @@ function autoFillExif(exif) {
   setIfEmpty('photoIso', exif.iso || '');
   setIfEmpty('photoFocal', exif.focalLength || '');
   setIfEmpty('photoDate', exif.dateTaken || '');
+
+  if (filled) {
+    showToast('📷 已自动读取照片 EXIF 参数', 'success');
+  }
 }
