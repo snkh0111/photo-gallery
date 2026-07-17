@@ -930,6 +930,18 @@ body {
   justify-content: center;
 }
 
+.preview-exif-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  font-size: 0.65rem;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  padding: 2px 5px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
 .preview-remove {
   position: absolute;
   top: 4px;

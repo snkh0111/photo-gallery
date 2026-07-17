@@ -75,8 +75,15 @@ async function parseExif(file) {
       if (marker === 0xffe1) {
         // APP1 — could be EXIF or XMP
         if (offset + 2 + 6 <= len) {
-          const id = readString(view, offset + 2, 6);
-          if (id === 'Exif\x00\x00') {
+          // Read raw EXIF identifier bytes (includes null bytes)
+          const b0 = view.getUint8(offset + 2);
+          const b1 = view.getUint8(offset + 3);
+          const b2 = view.getUint8(offset + 4);
+          const b3 = view.getUint8(offset + 5);
+          const b4 = view.getUint8(offset + 6);
+          const b5 = view.getUint8(offset + 7);
+          // 'Exif\0\0' = 69 120 105 102 0 0
+          if (b0 === 69 && b1 === 120 && b2 === 105 && b3 === 102 && b4 === 0 && b5 === 0) {
             tiffOffset = offset + 2 + 6; // after length + "Exif\0\0"
             console.log('EXIF: Found EXIF APP1 at offset', tiffOffset);
             break;

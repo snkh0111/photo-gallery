@@ -187,12 +187,16 @@ function updateFilePreview() {
   if (previewGrid) {
     previewGrid.innerHTML = selectedFiles
       .map(
-        (file, i) => `
+        (file, i) => {
+          const hasExif = file.exifData && (file.exifData.make || file.exifData.model || file.exifData.aperture);
+          return `
         <div class="preview-thumb">
           <img src="${file.previewUrl}" alt="${file.name}">
           <span class="preview-index">${i + 1}</span>
+          ${hasExif ? '<span class="preview-exif-badge" title="已读取EXIF参数">📷</span>' : ''}
           <button class="preview-remove" data-index="${i}" title="移除">✕</button>
-        </div>`
+        </div>`;
+        }
       )
       .join('');
 
