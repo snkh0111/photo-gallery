@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(npm approve-scripts *)",
+      "Bash(npm root *)",
+      "Bash(node install.cjs)",
+      "Bash(claude *)"
+    ]
+  }
+}

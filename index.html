@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人照片集</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== Header ===== -->
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo">📷 个人照片集</h1>
+      <div class="header-actions">
+        <button class="btn btn-icon theme-toggle" id="themeToggle" title="切换深色模式">🌙</button>
+        <button class="btn btn-primary upload-btn" id="openUploadBtn">
+          <span class="btn-icon-svg">＋</span> 上传照片
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Main Content ===== -->
+  <main class="main">
+
+    <!-- Filter Bar -->
+    <section class="filter-section">
+      <div class="filter-bar" id="filterBar">
+        <!-- Populated by JS -->
+      </div>
+      <div class="search-bar">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜索照片标题、标签或备注...">
+        <span class="photo-count" id="photoCount">0 张照片</span>
+      </div>
+    </section>
+
+    <!-- Gallery Grid -->
+    <section class="gallery" id="gallery">
+      <!-- Empty State -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">📸</div>
+        <h2>还没有照片</h2>
+        <p>点击上方「上传照片」按钮，开始构建你的照片集吧</p>
+        <button class="btn btn-primary" id="emptyUploadBtn">上传第一张照片</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Upload Modal ===== -->
+  <div class="modal-overlay" id="uploadModal">
+    <div class="modal upload-modal">
+      <div class="modal-header">
+        <h2>上传照片</h2>
+        <button class="btn btn-icon modal-close" id="closeUploadBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-zone-content">
+            <span class="drop-icon">📁</span>
+            <p>拖拽照片到这里，或点击选择文件</p>
+            <p class="drop-hint">支持 JPG、PNG、WebP 格式</p>
+          </div>
+          <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" hidden>
+        </div>
+
+        <!-- Preview -->
+        <div class="upload-preview" id="uploadPreview" style="display:none;">
+          <img id="previewImage" src="" alt="预览">
+          <button class="btn btn-sm btn-outline" id="changePhotoBtn">更换照片</button>
+        </div>
+
+        <!-- Form -->
+        <form class="upload-form" id="uploadForm">
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label for="photoTitle">照片标题 <span class="required">*</span></label>
+              <input type="text" id="photoTitle" placeholder="给你的照片起个名字" required>
+            </div>
+            <div class="form-group flex-1">
+              <label for="photoCategory">分类</label>
+              <select id="photoCategory">
+                <option value="风景">风景</option>
+                <option value="人像">人像</option>
+                <option value="旅行">旅行</option>
+                <option value="街拍">街拍</option>
+                <option value="美食">美食</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="photoDesc">描述</label>
+            <textarea id="photoDesc" rows="2" placeholder="简短描述这张照片..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="photoTags">标签（用逗号分隔）</label>
+            <input type="text" id="photoTags" placeholder="例如：日落, 海边, 旅行">
+          </div>
+
+          <!-- Equipment & Parameters -->
+          <fieldset class="form-fieldset">
+            <legend>📷 拍摄设备与参数</legend>
+            <div class="form-row">
+              <div class="form-group flex-2">
+                <label for="photoEquipment">相机与镜头</label>
+                <input type="text" id="photoEquipment" placeholder="例如：Sony A7M4 + FE 85mm f/1.4 GM">
+              </div>
+              <div class="form-group flex-1">
+                <label for="photoDate">拍摄日期</label>
+                <input type="date" id="photoDate">
+              </div>
+            </div>
+            <div class="form-row form-row-4">
+              <div class="form-group">
+                <label for="photoAperture">光圈</label>
+                <input type="text" id="photoAperture" placeholder="f/2.8">
+              </div>
+              <div class="form-group">
+                <label for="photoShutter">快门</label>
+                <input type="text" id="photoShutter" placeholder="1/200s">
+              </div>
+              <div class="form-group">
+                <label for="photoIso">ISO</label>
+                <input type="text" id="photoIso" placeholder="ISO 100">
+              </div>
+              <div class="form-group">
+                <label for="photoFocal">焦距</label>
+                <input type="text" id="photoFocal" placeholder="85mm">
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Rating -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>评分</label>
+              <div class="star-rating" id="uploadStarRating">
+                <span data-star="1">☆</span>
+                <span data-star="2">☆</span>
+                <span data-star="3">☆</span>
+                <span data-star="4">☆</span>
+                <span data-star="5">☆</span>
+              </div>
+              <input type="hidden" id="photoRating" value="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="photoNotes">备注</label>
+            <textarea id="photoNotes" rows="3" placeholder="关于这张照片的任何想法、拍摄心得..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="cancelUploadBtn">取消</button>
+        <button class="btn btn-primary" id="savePhotoBtn">保存照片</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Lightbox ===== -->
+  <div class="lightbox-overlay" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">✕</button>
+    <button class="lightbox-nav lightbox-prev" id="lightboxPrev">‹</button>
+    <button class="lightbox-nav lightbox-next" id="lightboxNext">›</button>
+    <div class="lightbox-content">
+      <div class="lightbox-image-area">
+        <img id="lightboxImage" src="" alt="">
+      </div>
+      <aside class="lightbox-detail" id="lightboxDetail">
+        <div class="detail-header">
+          <h2 id="detailTitle"></h2>
+          <button class="btn btn-icon" id="editPhotoBtn" title="编辑">✎</button>
+        </div>
+        <p class="detail-desc" id="detailDesc"></p>
+
+        <div class="detail-section">
+          <h3>📷 设备与参数</h3>
+          <table class="param-table">
+            <tr><td class="param-label">相机/镜头</td><td id="detailEquipment">-</td></tr>
+            <tr><td class="param-label">光圈</td><td id="detailAperture">-</td></tr>
+            <tr><td class="param-label">快门</td><td id="detailShutter">-</td></tr>
+            <tr><td class="param-label">ISO</td><td id="detailIso">-</td></tr>
+            <tr><td class="param-label">焦距</td><td id="detailFocal">-</td></tr>
+            <tr><td class="param-label">拍摄日期</td><td id="detailDate">-</td></tr>
+          </table>
+        </div>
+
+        <div class="detail-section">
+          <h3>⭐ 评分</h3>
+          <div class="star-rating large" id="detailStarRating">
+            <span data-star="1">☆</span>
+            <span data-star="2">☆</span>
+            <span data-star="3">☆</span>
+            <span data-star="4">☆</span>
+            <span data-star="5">☆</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>📝 备注</h3>
+          <p class="detail-notes" id="detailNotes"></p>
+        </div>
+
+        <div class="detail-tags" id="detailTags"></div>
+
+        <div class="detail-actions">
+          <button class="btn btn-outline btn-sm" id="editDetailBtn">✎ 编辑信息</button>
+          <button class="btn btn-danger btn-sm" id="deletePhotoBtn">🗑 删除照片</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ===== Toast Container ===== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ===== Edit Modal ===== -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal edit-modal">
+      <div class="modal-header">
+        <h2>编辑照片信息</h2>
+        <button class="btn btn-icon modal-close" id="closeEditBtn">✕</button>
+      </div>
+      <div class="modal-body" id="editModalBody">
+        <!-- Populated by JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="cancelEditBtn">取消</button>
+        <button class="btn btn-primary" id="saveEditBtn">保存修改</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/db.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/gallery.js"></script>
+  <script src="js/lightbox.js"></script>
+  <script src="js/upload.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
