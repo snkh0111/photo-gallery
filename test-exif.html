@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>EXIF 解析测试</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; background: #f8f9fa; }
+    .drop { border: 2px dashed #aaa; border-radius: 12px; padding: 60px 20px; text-align: center; cursor: pointer; background: #fff; }
+    .drop:hover { border-color: #4263eb; background: #dbe4ff; }
+    .result { margin-top: 20px; padding: 16px; background: #fff; border-radius: 8px; }
+    .ok { color: green; } .fail { color: red; }
+    .log { background: #1e1e1e; color: #0f0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; white-space: pre-wrap; margin-top: 12px; max-height: 400px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    td { padding: 6px 12px; border-bottom: 1px solid #eee; }
+    td:first-child { font-weight: bold; width: 120px; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>📷 EXIF 解析测试</h1>
+  <p>拖拽或点击选择一张相机拍摄的 JPG 照片来测试</p>
+
+  <div class="drop" id="drop">
+    <strong>拖拽 JPG 照片到这里</strong><br>
+    <small>（必须是从相机导出的原片，截图/网图没有 EXIF）</small>
+    <input type="file" id="fileInput" accept="image/jpeg" hidden>
+  </div>
+
+  <div class="log" id="log">等待选择照片...</div>
+  <div class="result" id="result" style="display:none;"></div>
+
+  <script src="js/exif.js"></script>
+  <script>
+    const drop = document.getElementById('drop');
+    const fileInput = document.getElementById('fileInput');
+    const logEl = document.getElementById('log');
+    const resultEl = document.getElementById('result');
+
+    function log(msg) {
+      logEl.textContent += '\n' + msg;
+    }
+
+    drop.addEventListener('click', () => fileInput.click());
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.background = '#dbe4ff'; });
+    drop.addEventListener('dragleave', () => { drop.style.background = '#fff'; });
+    drop.addEventListener('drop', e => {
+      e.preventDefault();
+      drop.style.background = '#fff';
+      if (e.dataTransfer.files.length > 0) testFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', e => {
+      if (e.target.files.length > 0) testFile(e.target.files[0]);
+    });
+
+    async function testFile(file) {
+      logEl.textContent = '正在分析: ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB, type=' + file.type + ')';
+
+      // Check file type
+      log('文件类型: ' + file.type);
+      if (!file.type.includes('jpeg') && !file.type.includes('jpg')) {
+        log('⚠️ 不是 JPEG 文件！只有相机直出的 JPG 才包含 EXIF 信息。');
+        log('如果你的照片是 HEIC/PNG/WebP 格式，它们通常不包含标准 EXIF。');
+      }
+
+      // Read first bytes to verify JPEG
+      const buf = await file.arrayBuffer();
+      const view = new DataView(buf);
+      const soi = view.getUint16(0, false);
+      log('文件头 (SOI): 0x' + soi.toString(16) + (soi === 0xffd8 ? ' ✅ 是 JPEG' : ' ❌ 不是 JPEG'));
+
+      // Parse EXIF
+      log('正在解析 EXIF...');
+      const startTime = performance.now();
+      const exif = await parseExif(file);
+      const elapsed = (performance.now() - startTime).toFixed(0);
+      log('解析耗时: ' + elapsed + 'ms');
+
+      // Show results
+      const fields = [
+        ['设备', exif.equipment || '(空)'],
+        ['品牌', exif.make || '(空)'],
+        ['型号', exif.model || '(空)'],
+        ['镜头', exif.lens || '(空)'],
+        ['光圈', exif.aperture || '(空)'],
+        ['快门', exif.shutter || '(空)'],
+        ['ISO', exif.iso || '(空)'],
+        ['焦距', exif.focalLength || '(空)'],
+        ['拍摄日期', exif.dateTaken || '(空)'],
+      ];
+
+      const hasData = fields.some(f => f[1] !== '(空)');
+
+      resultEl.style.display = 'block';
+      resultEl.innerHTML = '<h3 class="' + (hasData ? 'ok' : 'fail') + '">' +
+        (hasData ? '✅ 成功读取 EXIF 参数！' : '❌ 该照片没有 EXIF 数据') +
+        '</h3>' +
+        '<table>' + fields.map(f => '<tr><td>' + f[0] + '</td><td>' + f[1] + '</td></tr>').join('') + '</table>';
+
+      if (!hasData) {
+        resultEl.innerHTML += '<p style="color:#666;margin-top:12px;"><strong>可能原因：</strong><br>' +
+          '1. 这张照片不是相机直出的 JPG 原片<br>' +
+          '2. 照片经过了某些 APP/社交媒体的压缩处理（会删除 EXIF）<br>' +
+          '3. 是截图、网图、或从聊天记录保存的图片<br><br>' +
+          '💡 <strong>解决方法：</strong>请用相机/手机相机直接拍摄的原始 JPG 文件测试，' +
+          '例如从 SD 卡、相机传输、或手机相册中导出的「原图」。</p>';
+      }
+    }
+  </script>
+</body>
+</html>
