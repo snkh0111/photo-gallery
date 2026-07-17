@@ -6,7 +6,19 @@
       "Bash(npm approve-scripts *)",
       "Bash(npm root *)",
       "Bash(node install.cjs)",
-      "Bash(claude *)"
+      "Bash(claude *)",
+      "Bash(git push *)",
+      "Bash(sudo apt-get install -y gh)",
+      "Bash(sudo snap install gh)",
+      "Bash(curl -fsSL https://github.com/cli/cli/releases/download/v2.63.2/gh_2.63.2_linux_amd64.tar.gz -o /tmp/gh.tar.gz)",
+      "Bash(tar -xzf /tmp/gh.tar.gz -C /tmp)",
+      "Bash(sudo cp /tmp/gh_2.63.2_linux_amd64/bin/gh /usr/local/bin/)",
+      "Read(//tmp/**)",
+      "Bash(/tmp/gh_*/bin/gh --version)",
+      "Bash(mkdir -p ~/.local/bin)",
+      "Bash(curl -fsSL https://github.com/cli/cli/releases/download/v2.63.2/gh_2.63.2_linux_amd64.tar.gz)",
+      "Bash(tar -xz -C ~/.local --strip-components=2 gh_2.63.2_linux_amd64/bin/gh)",
+      "Bash(~/.local/bin/gh --version)"
     ]
   }
 }

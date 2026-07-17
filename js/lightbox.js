@@ -9,13 +9,13 @@ let currentLightboxIndex = -1;
  * Open the lightbox for a specific photo
  */
 async function openLightbox(photoId) {
-  const photo = await getPhotoById(photoId);
+  const photo = await getPhotoByIdUnified(photoId);
   if (!photo) return;
 
   currentLightboxPhotoId = photoId;
 
   // Find index in current photo list for prev/next navigation
-  const photos = currentPhotos.length > 0 ? currentPhotos : await getAllPhotos();
+  const photos = currentPhotos.length > 0 ? currentPhotos : await getAllPhotosUnified();
   currentLightboxIndex = photos.findIndex((p) => p.id === photoId);
 
   // Update detail panel
@@ -23,7 +23,7 @@ async function openLightbox(photoId) {
 
   // Show image
   const lightboxImage = document.getElementById('lightboxImage');
-  lightboxImage.src = URL.createObjectURL(photo.imageData);
+  lightboxImage.src = getPhotoDisplayUrl(photo);
   lightboxImage.alt = photo.title;
 
   // Open lightbox
@@ -48,7 +48,7 @@ function closeLightbox() {
  * Navigate to prev/next photo
  */
 async function navigateLightbox(direction) {
-  const photos = currentPhotos.length > 0 ? currentPhotos : await getAllPhotos();
+  const photos = currentPhotos.length > 0 ? currentPhotos : await getAllPhotosUnified();
   if (photos.length === 0) return;
 
   let newIndex = currentLightboxIndex + direction;
@@ -62,11 +62,11 @@ async function navigateLightbox(direction) {
   populateLightboxDetail(photo);
 
   const lightboxImage = document.getElementById('lightboxImage');
-  // Revoke old URL to free memory
+  // Revoke old URL only for local blob URLs
   if (lightboxImage.src.startsWith('blob:')) {
     URL.revokeObjectURL(lightboxImage.src);
   }
-  lightboxImage.src = URL.createObjectURL(photo.imageData);
+  lightboxImage.src = getPhotoDisplayUrl(photo);
   lightboxImage.alt = photo.title;
 
   updateDetailStars(photo.rating);
@@ -97,9 +97,11 @@ function populateLightboxDetail(photo) {
     tagsContainer.style.display = 'none';
   }
 
-  // Store current photo ID for edit/delete actions
+  // Store current photo ID and source for edit/delete actions
   document.getElementById('editDetailBtn').dataset.photoId = photo.id;
+  document.getElementById('editDetailBtn').dataset.photoSource = photo.source || 'local';
   document.getElementById('deletePhotoBtn').dataset.photoId = photo.id;
+  document.getElementById('deletePhotoBtn').dataset.photoSource = photo.source || 'local';
 }
 
 /**
@@ -112,6 +114,12 @@ function setupDetailStarRating() {
     if (!e.target.dataset.star) return;
     const star = parseInt(e.target.dataset.star);
     if (currentLightboxPhotoId) {
+      // Check if cloud photo
+      const photo = await getPhotoByIdUnified(currentLightboxPhotoId);
+      if (photo && photo.source === 'cloud') {
+        updateDetailStars(photo.rating);
+        return;
+      }
       await updatePhoto(currentLightboxPhotoId, { rating: star });
       updateDetailStars(star);
       showToast('评分已更新', 'success');
@@ -182,16 +190,27 @@ function setupLightbox() {
 
   // Edit buttons (header icon + detail action)
   function handleEditClick() {
-    const photoId = parseInt(document.getElementById('editDetailBtn').dataset.photoId);
-    if (photoId) openEditModal(photoId);
+    const photoId = document.getElementById('editDetailBtn').dataset.photoId;
+    const photoSource = document.getElementById('editDetailBtn').dataset.photoSource;
+    if (photoSource === 'cloud') {
+      showToast('云端照片请在 GitHub 上编辑', 'info');
+      return;
+    }
+    if (photoId) openEditModal(parseInt(photoId));
   }
   document.getElementById('editPhotoBtn').addEventListener('click', handleEditClick);
   document.getElementById('editDetailBtn').addEventListener('click', handleEditClick);
 
   // Delete button
   document.getElementById('deletePhotoBtn').addEventListener('click', async () => {
-    const photoId = parseInt(document.getElementById('deletePhotoBtn').dataset.photoId);
+    const btn = document.getElementById('deletePhotoBtn');
+    const photoId = parseInt(btn.dataset.photoId);
     if (!photoId) return;
+
+    if (btn.dataset.photoSource === 'cloud') {
+      showToast('云端照片请在 GitHub 上删除', 'info');
+      return;
+    }
 
     if (!confirm('确定要删除这张照片吗？此操作不可撤销。')) return;
 

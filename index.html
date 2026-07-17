@@ -65,10 +65,12 @@
           <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" hidden>
         </div>
 
-        <!-- Preview -->
-        <div class="upload-preview" id="uploadPreview" style="display:none;">
-          <img id="previewImage" src="" alt="预览">
-          <button class="btn btn-sm btn-outline" id="changePhotoBtn">更换照片</button>
+        <!-- Multi-Preview -->
+        <div class="upload-preview-container" style="display:none;">
+          <div class="upload-preview-grid" id="previewGrid"></div>
+          <div style="text-align:right;margin-top:8px;">
+            <span class="preview-count" id="previewCount">0 张</span>
+          </div>
         </div>
 
         <!-- Form -->
@@ -236,8 +238,44 @@
     </div>
   </div>
 
+  <!-- ===== Footer - Social Links ===== -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <h3>📷 个人照片集</h3>
+        <p>记录生活中的每一个瞬间</p>
+      </div>
+      <div class="footer-social">
+        <h4>社交账号</h4>
+        <div class="social-links">
+          <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="social-link" title="Instagram">
+            <span class="social-icon">📷</span> Instagram
+          </a>
+          <a href="https://www.xiaohongshu.com/" target="_blank" rel="noopener" class="social-link" title="小红书">
+            <span class="social-icon">📕</span> 小红书
+          </a>
+          <a href="https://github.com/snkh0111" target="_blank" rel="noopener" class="social-link" title="GitHub">
+            <span class="social-icon">💻</span> GitHub
+          </a>
+          <a href="https://twitter.com/" target="_blank" rel="noopener" class="social-link" title="Twitter / X">
+            <span class="social-icon">🐦</span> Twitter / X
+          </a>
+        </div>
+      </div>
+      <div class="footer-contact">
+        <h4>联系我</h4>
+        <a href="mailto:luyi.dustin@gmail.com" class="contact-email">📧 luyi.dustin@gmail.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Dustin Luyi · Powered by GitHub Pages</p>
+    </div>
+  </footer>
+
   <!-- Scripts -->
+  <script src="js/exif.js"></script>
   <script src="js/db.js"></script>
+  <script src="js/cloud.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/gallery.js"></script>
   <script src="js/lightbox.js"></script>

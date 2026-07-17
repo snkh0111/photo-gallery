@@ -1,0 +1,53 @@
+[
+  {
+    "id": "cloud-1",
+    "title": "城市天际线",
+    "description": "上海陆家嘴日落时分",
+    "category": "风景",
+    "tags": ["城市", "日落", "上海"],
+    "url": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&q=60",
+    "equipment": "Sony A7M4 + FE 16-35mm f/2.8 GM II",
+    "aperture": "f/8.0",
+    "shutter": "1/60s",
+    "iso": "ISO 100",
+    "focalLength": "24mm",
+    "rating": 5,
+    "notes": "在环球金融中心100层拍摄，能见度极好。",
+    "dateTaken": "2026-07-15"
+  },
+  {
+    "id": "cloud-2",
+    "title": "雨后小径",
+    "description": "杭州龙井村茶园雨后的小径",
+    "category": "旅行",
+    "tags": ["雨天", "茶园", "杭州"],
+    "url": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=60",
+    "equipment": "Fujifilm X-T5 + XF 23mm f/1.4 R LM WR",
+    "aperture": "f/2.8",
+    "shutter": "1/250s",
+    "iso": "ISO 400",
+    "focalLength": "23mm",
+    "rating": 4,
+    "notes": "雨后的光线特别柔和，茶叶上的水珠闪闪发光。",
+    "dateTaken": "2026-07-12"
+  },
+  {
+    "id": "cloud-3",
+    "title": "樱花季",
+    "description": "东京目黑川沿岸的樱花",
+    "category": "旅行",
+    "tags": ["樱花", "日本", "春天"],
+    "url": "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=800&q=80",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=400&q=60",
+    "equipment": "Canon EOS R5 + RF 70-200mm f/2.8L IS USM",
+    "aperture": "f/2.8",
+    "shutter": "1/500s",
+    "iso": "ISO 200",
+    "focalLength": "135mm",
+    "rating": 5,
+    "notes": "樱花季的东京真的太美了，河两岸全是粉色。",
+    "dateTaken": "2026-04-05"
+  }
+]

@@ -31,10 +31,7 @@ async function initApp() {
     // 2. Initialize theme
     initTheme();
 
-    // 3. Seed demo photos if first time
-    await seedDemoPhotos();
-
-    // 4. Setup UI components
+    // 3. Setup UI components
     setupSearch();
     setupUpload();
     setupLightbox();

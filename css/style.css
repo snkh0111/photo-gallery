@@ -882,3 +882,175 @@ body {
 @media (max-width: 400px) {
   .gallery { column-count: 1; }
 }
+
+/* ============================================
+   Multi-File Preview Grid
+   ============================================ */
+.upload-preview-container {
+  margin-bottom: 20px;
+}
+
+.upload-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.preview-thumb {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: var(--bg-tertiary);
+}
+
+.preview-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.preview-index {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.preview-remove:hover {
+  background: var(--danger);
+}
+
+.preview-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+.footer {
+  margin-top: 60px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  padding: 48px 24px 24px;
+}
+
+.footer-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 40px;
+}
+
+.footer-brand h3 {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.footer-brand p {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.footer-social h4,
+.footer-contact h4 {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.social-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 8px 0;
+  transition: color 0.2s, transform 0.2s;
+}
+.social-link:hover {
+  color: var(--accent);
+  transform: translateX(4px);
+}
+
+.social-icon {
+  font-size: 1.1rem;
+}
+
+.contact-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.contact-email:hover {
+  text-decoration: underline;
+}
+
+.footer-bottom {
+  max-width: 1400px;
+  margin: 32px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.footer-bottom p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 700px) {
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .upload-preview-grid {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  }
+}

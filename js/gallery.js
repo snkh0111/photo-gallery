@@ -1,25 +1,20 @@
 /**
  * Gallery rendering - masonry grid, filtering, search
+ * Supports both cloud (photos.json) and local (IndexedDB) photos
  */
 
 let currentCategory = '全部';
-let currentSearchQuery = '';
 let currentPhotos = [];
 
 /**
  * Render the full gallery: filter bar + photo grid
  */
 async function renderGallery() {
-  const photos = await getAllPhotos(currentCategory);
+  const photos = await getAllPhotosUnified(currentCategory);
   currentPhotos = photos;
 
-  // Update filter bar
   await renderFilterBar();
-
-  // Render photo grid
   renderPhotoGrid(photos);
-
-  // Update photo count
   document.getElementById('photoCount').textContent = `${photos.length} 张照片`;
 }
 
@@ -27,7 +22,7 @@ async function renderGallery() {
  * Render the category filter chips
  */
 async function renderFilterBar() {
-  const categories = await getAllCategories();
+  const categories = await getAllCategoriesUnified();
   const filterBar = document.getElementById('filterBar');
 
   filterBar.innerHTML = categories
@@ -38,14 +33,11 @@ async function renderFilterBar() {
     )
     .join('');
 
-  // Bind click events
   filterBar.querySelectorAll('.filter-chip').forEach((chip) => {
     chip.addEventListener('click', () => {
       currentCategory = chip.dataset.category;
-      // Update active state
       filterBar.querySelectorAll('.filter-chip').forEach((c) => c.classList.remove('active'));
       chip.classList.add('active');
-      // Re-render
       renderGallery();
     });
   });
@@ -59,22 +51,16 @@ function renderPhotoGrid(photos) {
   const emptyState = document.getElementById('emptyState');
 
   if (photos.length === 0) {
-    // Show empty state, hide photo cards
     if (emptyState) emptyState.style.display = '';
-    // Remove all photo cards
     gallery.querySelectorAll('.gallery-item').forEach((el) => el.remove());
     return;
   }
 
-  // Hide empty state
   if (emptyState) emptyState.style.display = 'none';
-
-  // Remove existing photo cards
   gallery.querySelectorAll('.gallery-item').forEach((el) => el.remove());
 
-  // Create and append photo cards
-  photos.forEach((photo, index) => {
-    const item = createGalleryItem(photo, index);
+  photos.forEach((photo) => {
+    const item = createGalleryItem(photo);
     gallery.appendChild(item);
   });
 }
@@ -82,18 +68,26 @@ function renderPhotoGrid(photos) {
 /**
  * Create a single gallery item card
  */
-function createGalleryItem(photo, index) {
+function createGalleryItem(photo) {
   const item = document.createElement('div');
   item.className = 'gallery-item';
   item.dataset.photoId = photo.id;
 
-  // Image
   const img = document.createElement('img');
-  img.src = URL.createObjectURL(photo.thumbnail || photo.imageData);
+  img.src = getPhotoThumbnailUrl(photo);
   img.alt = photo.title;
   img.loading = 'lazy';
 
-  // Overlay on hover
+  // Cloud badge
+  if (photo.source === 'cloud') {
+    const badge = document.createElement('span');
+    badge.className = 'cloud-badge';
+    badge.textContent = '☁️';
+    badge.title = '云端照片';
+    badge.style.cssText = 'position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.5);color:#fff;padding:4px 8px;border-radius:6px;font-size:0.75rem;pointer-events:none;z-index:2;';
+    item.appendChild(badge);
+  }
+
   const overlay = document.createElement('div');
   overlay.className = 'gallery-item-overlay';
 
@@ -113,7 +107,6 @@ function createGalleryItem(photo, index) {
   item.appendChild(img);
   item.appendChild(overlay);
 
-  // Click to open lightbox
   item.addEventListener('click', () => {
     openLightbox(photo.id);
   });
@@ -142,9 +135,16 @@ function setupSearch() {
   searchInput.addEventListener('input', () => {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(async () => {
-      const query = searchInput.value.trim();
+      const query = searchInput.value.trim().toLowerCase();
       if (query) {
-        const results = await searchPhotos(query);
+        const all = await getAllPhotosUnified();
+        const results = all.filter((p) => {
+          const searchText = [
+            p.title, p.description, p.notes, p.equipment,
+            (p.tags || []).join(' '),
+          ].join(' ').toLowerCase();
+          return searchText.includes(query);
+        });
         renderPhotoGrid(results);
         document.getElementById('photoCount').textContent = `${results.length} 张照片`;
       } else {
