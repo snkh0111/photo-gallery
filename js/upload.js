@@ -28,9 +28,9 @@ function setupUpload() {
   fileInput.setAttribute('multiple', 'multiple');
 
   // File input change
-  fileInput.addEventListener('change', (e) => {
+  fileInput.addEventListener('change', async (e) => {
     if (e.target.files.length > 0) {
-      handleFilesSelect(Array.from(e.target.files));
+      await handleFilesSelect(Array.from(e.target.files));
     }
   });
 
@@ -44,11 +44,11 @@ function setupUpload() {
     dropZone.classList.remove('drag-over');
   });
 
-  dropZone.addEventListener('drop', (e) => {
+  dropZone.addEventListener('drop', async (e) => {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
     if (e.dataTransfer.files.length > 0) {
-      handleFilesSelect(Array.from(e.dataTransfer.files));
+      await handleFilesSelect(Array.from(e.dataTransfer.files));
     }
   });
 
@@ -59,7 +59,7 @@ function setupUpload() {
   setupUploadStarRating();
 
   // Paste from clipboard
-  document.addEventListener('paste', (e) => {
+  document.addEventListener('paste', async (e) => {
     if (!uploadModal.classList.contains('open')) return;
     const items = Array.from(e.clipboardData.items).filter(
       (item) => item.type.startsWith('image/')
@@ -67,7 +67,7 @@ function setupUpload() {
     if (items.length > 0) {
       e.preventDefault();
       const files = items.map((item) => item.getAsFile()).filter(Boolean);
-      handleFilesSelect(files);
+      await handleFilesSelect(files);
     }
   });
 }
